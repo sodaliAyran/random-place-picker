@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -7,15 +9,25 @@ import datetime
 from app import Base, Place, AvailableHour, DailySelection
 
 # SQLite database URL
-DATABASE_URL = "sqlite:///./places.db"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create engine and session
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Sample data for seeding
 places = [
-    "Cafe Aroma", "Pizza Palace", "Sushi Spot", "Burger Barn", "Steakhouse", "Vegan Delight"
+    "Taksim İstiklal Caddesi",
+    "Kadıköy Rıhtım",
+    "Saraçhane",
+    "Şişli Kurtuluş Caddesi",
+    "Levent Sapphire Önü",
+    "Beşiktaş Barbaros Bulvarı",
+    "FSM Köprüsü",
+    "Dolmabahçe Sarayı",
+    "Maçka Parkı",
+    "Taksim Gezi Parkı",
+    "Bağdat Caddesi Suadiye Işıklar"
 ]
 
 available_hours = [

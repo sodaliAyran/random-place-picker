@@ -1,3 +1,5 @@
+import os
+
 import uvicorn
 from fastapi import FastAPI, Depends
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, func
@@ -9,16 +11,18 @@ import datetime
 
 import logging
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Database setup
-DATABASE_URL = "sqlite:///./places.db"  # Change to PostgreSQL URL in production
+DATABASE_URL = os.getenv("DATABASE_URL")
 TODAY_CHOICES = "today_choices"
 FINAL_PLACE = "final_place"
 GATHERING_TIME = "gathering_time"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -48,6 +52,14 @@ class DailySelection(Base):
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:8081"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # In-memory cache
 CACHE = {TODAY_CHOICES: None, FINAL_PLACE: None, GATHERING_TIME: None}
@@ -184,7 +196,7 @@ def _is_within_two_hours_from_now(gathering_time):
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(pick_places, "cron", hour=0, minute=0)  # Pick new places and time every midnight
-scheduler.add_job(pick_final_place, "interval", minutes=1)  # Check every 15 minutes to pick the final place
+scheduler.add_job(pick_final_place, "interval", minutes=15)  # Check every 15 minutes to pick the final place
 scheduler.start()
 
 """ Returns the daily selected places, gathering time, and final place if selected."""
