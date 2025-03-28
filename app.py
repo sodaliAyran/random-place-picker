@@ -226,5 +226,9 @@ def get_choices(db: Session = Depends(get_db)):
                 CACHE[FINAL_PLACE] = today_selection.final_place
     return response
 
+@app.get("/healthz")
+def health_check():
+    return {"status": "healthy", "timestamp": datetime.datetime.utcnow()}
+
 if __name__ == "__main__":
     uvicorn.run(app, reload=False, log_level=logging.INFO)
