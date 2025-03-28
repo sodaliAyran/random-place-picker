@@ -55,7 +55,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8081", "https://bugunneredeyiz.onrender.com/"],
+    allow_origins=["https://bugunneredeyiz.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
